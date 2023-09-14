@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "secret-spectator",
+  "version": "${version}",
+  "name": "Secret Spectator",
+  "description": "Server side mod that doesn't tell clients when someone enters spectator mode",
+  "authors": [
+    "replaceitem"
+  ],
+  "contact": {
+    "website": "https://github.com/replaceitem",
+    "repo": "https://github.com/replaceitem/secret-spectator"
+  },
+  "license": "MIT",
+  "icon": "assets/secret-spectator/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "net.replaceitem.secretspectator.SecretSpectator"
+    ]
+  },
+  "mixins": [
+    "secret-spectator.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}"
+  }
+}
