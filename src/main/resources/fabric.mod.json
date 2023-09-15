@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "icon": "assets/secret-spectator/icon.png",
-  "environment": "server",
+  "environment": "*",
   "entrypoints": {
     "main": [
       "net.replaceitem.secretspectator.SecretSpectator"
