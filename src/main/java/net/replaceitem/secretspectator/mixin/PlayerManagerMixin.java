@@ -17,7 +17,7 @@ public class PlayerManagerMixin {
     private void fakeSelfConnectPacket(ServerPlayNetworkHandler serverPlayNetworkHandler, Packet<?> packet) {
         ServerPlayerEntity player = serverPlayNetworkHandler.getPlayer();
         PlayerListS2CPacket playerListS2CPacket = ((PlayerListS2CPacket) packet);
-        if(!player.isSpectator()) {
+        if(!SecretSpectator.canSeeOtherSpectators(player)) {
             playerListS2CPacket = SecretSpectator.copyPacketWithModifiedEntries(playerListS2CPacket, entry -> SecretSpectator.cloneEntryWithGamemode(entry, GameMode.SURVIVAL));
         }
         serverPlayNetworkHandler.sendPacket(playerListS2CPacket);
@@ -27,19 +27,14 @@ public class PlayerManagerMixin {
     private void fakeOtherConnectPacket(PlayerManager playerManager, Packet<?> packet) {
         PlayerListS2CPacket playerListS2CPacket = (PlayerListS2CPacket) packet;
         PlayerListS2CPacket.Entry entry = playerListS2CPacket.getEntries().get(0);
-        if(entry.gameMode() == GameMode.SPECTATOR) {
-            // we log in in spectator
-            // tell other spectators the truth
-            for (ServerPlayerEntity serverPlayerEntity : playerManager.getPlayerList()) {
-                if(serverPlayerEntity.isSpectator()) serverPlayerEntity.networkHandler.sendPacket(packet);
-            }
-            // lie to the rest
+        ServerPlayerEntity player = playerManager.getPlayer(entry.profileId());
+        if(player != null && player.isSpectator()) {
+            // we log in as spectator
             PlayerListS2CPacket fakePacket = SecretSpectator.copyPacketWithModifiedEntries(playerListS2CPacket, entry1 -> SecretSpectator.cloneEntryWithGamemode(entry1, GameMode.SURVIVAL));
             for (ServerPlayerEntity serverPlayerEntity : playerManager.getPlayerList()) {
-                if(!serverPlayerEntity.isSpectator()) serverPlayerEntity.networkHandler.sendPacket(fakePacket);
+                serverPlayerEntity.networkHandler.sendPacket(SecretSpectator.canPlayerSeeSpectatorOf(serverPlayerEntity, player) ? packet : fakePacket);
             }
         } else {
-            // we log in in survival
             playerManager.sendToAll(packet);
         }
     }

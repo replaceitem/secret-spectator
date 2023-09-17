@@ -21,14 +21,13 @@ public class ServerPlayerInteractionManagerMixin {
     @Redirect(method = "changeGameMode", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;sendToAll(Lnet/minecraft/network/packet/Packet;)V"))
     private void sendPackets(PlayerManager playerManager, Packet<ClientPlayPacketListener> packet) {
         if(this.player.isSpectator()) {
-            // we're going in spectator, we should know
-            this.player.networkHandler.sendPacket(packet);
-            
             for (ServerPlayerEntity serverPlayerEntity : playerManager.getPlayerList()) {
-                if(this.player != serverPlayerEntity && serverPlayerEntity.isSpectator()) {
-                    // only let other spectators know we are in spec now
+                if(SecretSpectator.canPlayerSeeSpectatorOf(serverPlayerEntity, this.player)) {
+                    // let other players know who should see us being in spectator
                     serverPlayerEntity.networkHandler.sendPacket(packet);
-                    // other spectators let us now know
+                }
+                if(!serverPlayerEntity.equals(this.player) && serverPlayerEntity.isSpectator() && SecretSpectator.canPlayerSeeSpectatorOf(this.player, serverPlayerEntity)) {
+                    // let us know which other spectators
                     this.player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_GAME_MODE, serverPlayerEntity));
                 }
             }
@@ -36,13 +35,15 @@ public class ServerPlayerInteractionManagerMixin {
             // we let all know
             this.player.server.getPlayerManager().sendToAll(packet);
             // other spectators tell us they're in survival
-            for (ServerPlayerEntity serverPlayerEntity : playerManager.getPlayerList()) {
-                if(this.player != serverPlayerEntity && serverPlayerEntity.isSpectator()) {
-                    PlayerListS2CPacket backToSurvivalPacket = SecretSpectator.copyPacketWithModifiedEntries(
-                            new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_GAME_MODE, serverPlayerEntity),
-                            entry -> SecretSpectator.cloneEntryWithGamemode(entry, GameMode.SURVIVAL)
-                    );
-                    this.player.networkHandler.sendPacket(backToSurvivalPacket);
+            if(!SecretSpectator.canSeeOtherSpectators(this.player)) {
+                for (ServerPlayerEntity serverPlayerEntity : playerManager.getPlayerList()) {
+                    if (this.player != serverPlayerEntity && serverPlayerEntity.isSpectator()) {
+                        PlayerListS2CPacket backToSurvivalPacket = SecretSpectator.copyPacketWithModifiedEntries(
+                                new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_GAME_MODE, serverPlayerEntity),
+                                entry -> SecretSpectator.cloneEntryWithGamemode(entry, GameMode.SURVIVAL)
+                        );
+                        this.player.networkHandler.sendPacket(backToSurvivalPacket);
+                    }
                 }
             }
         }

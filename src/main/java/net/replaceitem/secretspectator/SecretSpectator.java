@@ -2,6 +2,7 @@ package net.replaceitem.secretspectator;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameMode;
 import net.replaceitem.secretspectator.mixin.PlayerListS2CPacketAccessor;
 
@@ -22,5 +23,14 @@ public class SecretSpectator implements ModInitializer {
     
     public static PlayerListS2CPacket.Entry cloneEntryWithGamemode(PlayerListS2CPacket.Entry entry, GameMode newGameMode) {
         return new PlayerListS2CPacket.Entry(entry.profileId(), entry.profile(), entry.listed(), entry.latency(), newGameMode, entry.displayName(), entry.chatSession());
+    }
+    
+    
+    public static boolean canSeeOtherSpectators(ServerPlayerEntity player) {
+        return player.isSpectator() || player.hasPermissionLevel(2);
+    }
+    
+    public static boolean canPlayerSeeSpectatorOf(ServerPlayerEntity player, ServerPlayerEntity other) {
+        return player.equals(other) || canSeeOtherSpectators(player);
     }
 }
