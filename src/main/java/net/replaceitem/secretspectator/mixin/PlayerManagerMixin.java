@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(PlayerManager.class)
 public class PlayerManagerMixin {
-    @Redirect(method = "onPlayerConnect", at = @At(value = "INVOKE", ordinal = 8, target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"))
+    @Redirect(method = "onPlayerConnect", at = @At(value = "INVOKE", ordinal = 5, target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;sendPacket(Lnet/minecraft/network/packet/Packet;)V"))
     private void fakeSelfConnectPacket(ServerPlayNetworkHandler serverPlayNetworkHandler, Packet<?> packet) {
         ServerPlayerEntity player = serverPlayNetworkHandler.getPlayer();
         PlayerListS2CPacket playerListS2CPacket = ((PlayerListS2CPacket) packet);
