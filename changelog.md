@@ -1,1 +1,0 @@
-* Players with OP level 2 or higher can now always see spectators
