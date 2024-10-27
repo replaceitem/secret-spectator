@@ -22,7 +22,7 @@ public class SecretSpectator implements ModInitializer {
     }
     
     public static PlayerListS2CPacket.Entry cloneEntryWithGamemode(PlayerListS2CPacket.Entry entry, GameMode newGameMode) {
-        return new PlayerListS2CPacket.Entry(entry.profileId(), entry.profile(), entry.listed(), entry.latency(), newGameMode, entry.displayName(), entry.chatSession());
+        return new PlayerListS2CPacket.Entry(entry.profileId(), entry.profile(), entry.listed(), entry.latency(), newGameMode, entry.displayName(), entry.listOrder(), entry.chatSession());
     }
     
     
