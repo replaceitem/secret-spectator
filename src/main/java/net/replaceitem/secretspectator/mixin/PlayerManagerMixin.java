@@ -33,7 +33,7 @@ public class PlayerManagerMixin {
             // we log in as spectator
             PlayerListS2CPacket fakePacket = SecretSpectator.copyPacketWithModifiedEntries(playerListS2CPacket, entry1 -> SecretSpectator.cloneEntryWithGamemode(entry1, GameMode.SURVIVAL));
             for (ServerPlayerEntity serverPlayerEntity : instance.getPlayerList()) {
-                serverPlayerEntity.networkHandler.sendPacket(SecretSpectator.canPlayerSeeSpectatorOf(serverPlayerEntity, player) ? packet : fakePacket);
+                serverPlayerEntity.networkHandler.sendPacket(SecretSpectator.canPlayerSeeThatOtherIsSpectator(serverPlayerEntity, player) ? packet : fakePacket);
             }
         } else {
             original.call(instance, packet);

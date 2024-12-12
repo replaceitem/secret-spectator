@@ -22,11 +22,11 @@ public class ServerPlayerInteractionManagerMixin {
     private void sendPackets(PlayerManager instance, Packet<?> packet, Operation<Void> original) {
         if(this.player.isSpectator()) {
             for (ServerPlayerEntity serverPlayerEntity : instance.getPlayerList()) {
-                if(SecretSpectator.canPlayerSeeSpectatorOf(serverPlayerEntity, this.player)) {
+                if(SecretSpectator.canPlayerSeeThatOtherIsSpectator(serverPlayerEntity, this.player)) {
                     // let other players know who should see us being in spectator
                     serverPlayerEntity.networkHandler.sendPacket(packet);
                 }
-                if(!serverPlayerEntity.equals(this.player) && serverPlayerEntity.isSpectator() && SecretSpectator.canPlayerSeeSpectatorOf(this.player, serverPlayerEntity)) {
+                if(!serverPlayerEntity.equals(this.player) && serverPlayerEntity.isSpectator() && SecretSpectator.canPlayerSeeThatOtherIsSpectator(this.player, serverPlayerEntity)) {
                     // let us know which other spectators
                     this.player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_GAME_MODE, serverPlayerEntity));
                 }

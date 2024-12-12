@@ -22,7 +22,7 @@ public class SecretSpectator implements ModInitializer {
     }
     
     public static PlayerListS2CPacket.Entry cloneEntryWithGamemode(PlayerListS2CPacket.Entry entry, GameMode newGameMode) {
-        return new PlayerListS2CPacket.Entry(entry.profileId(), entry.profile(), entry.listed(), entry.latency(), newGameMode, entry.displayName(), entry.listOrder(), entry.chatSession());
+        return new PlayerListS2CPacket.Entry(entry.profileId(), entry.profile(), entry.listed(), entry.latency(), newGameMode, entry.displayName(), entry.showHat(), entry.listOrder(), entry.chatSession());
     }
     
     
@@ -30,7 +30,7 @@ public class SecretSpectator implements ModInitializer {
         return player.isSpectator() || player.hasPermissionLevel(2);
     }
     
-    public static boolean canPlayerSeeSpectatorOf(ServerPlayerEntity player, ServerPlayerEntity other) {
+    public static boolean canPlayerSeeThatOtherIsSpectator(ServerPlayerEntity player, ServerPlayerEntity other) {
         return player.equals(other) || canSeeOtherSpectators(player);
     }
 }
