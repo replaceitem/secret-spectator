@@ -14,36 +14,41 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.EnumSet;
+import java.util.List;
+
 @Mixin(ServerPlayerInteractionManager.class)
 public class ServerPlayerInteractionManagerMixin {
     @Shadow @Final protected ServerPlayerEntity player;
 
     @WrapOperation(method = "changeGameMode", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;sendToAll(Lnet/minecraft/network/packet/Packet;)V"))
-    private void sendPackets(PlayerManager instance, Packet<?> packet, Operation<Void> original) {
+    private void sendPackets(PlayerManager playerManager, Packet<?> packet, Operation<Void> original) {
         if(this.player.isSpectator()) {
-            for (ServerPlayerEntity serverPlayerEntity : instance.getPlayerList()) {
-                if(SecretSpectator.canPlayerSeeThatOtherIsSpectator(serverPlayerEntity, this.player)) {
+            for (ServerPlayerEntity other : playerManager.getPlayerList()) {
+                if(SecretSpectator.canPlayerSeeThatOtherIsSpectator(other, this.player)) {
                     // let other players know who should see us being in spectator
-                    serverPlayerEntity.networkHandler.sendPacket(packet);
-                }
-                if(!serverPlayerEntity.equals(this.player) && serverPlayerEntity.isSpectator() && SecretSpectator.canPlayerSeeThatOtherIsSpectator(this.player, serverPlayerEntity)) {
-                    // let us know which other spectators
-                    this.player.networkHandler.sendPacket(new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_GAME_MODE, serverPlayerEntity));
+                    other.networkHandler.sendPacket(packet);
                 }
             }
+            // send all current spectators to us
+            List<ServerPlayerEntity> visibleOtherSpectators = playerManager.getPlayerList().stream()
+                    .filter(other -> !other.equals(this.player) && other.isSpectator() && SecretSpectator.canPlayerSeeThatOtherIsSpectator(this.player, other))
+                    .toList();
+            if(!visibleOtherSpectators.isEmpty()) {
+                this.player.networkHandler.sendPacket(new PlayerListS2CPacket(EnumSet.of(PlayerListS2CPacket.Action.UPDATE_GAME_MODE), visibleOtherSpectators));
+            }
         } else {
-            // we let all know
+            // we let all know we went in survival
             original.call(this.player.server.getPlayerManager(), packet);
             // other spectators tell us they're in survival
             if(!SecretSpectator.canSeeOtherSpectators(this.player)) {
-                for (ServerPlayerEntity serverPlayerEntity : instance.getPlayerList()) {
-                    if (this.player != serverPlayerEntity && serverPlayerEntity.isSpectator()) {
-                        PlayerListS2CPacket backToSurvivalPacket = SecretSpectator.copyPacketWithModifiedEntries(
-                                new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_GAME_MODE, serverPlayerEntity),
-                                entry -> SecretSpectator.cloneEntryWithGamemode(entry, GameMode.SURVIVAL)
-                        );
-                        this.player.networkHandler.sendPacket(backToSurvivalPacket);
-                    }
+                List<ServerPlayerEntity> pretendSurvivalPlayers = playerManager.getPlayerList().stream().filter(other -> !other.equals(this.player) && other.isSpectator()).toList();
+                if(!pretendSurvivalPlayers.isEmpty()) {
+                    PlayerListS2CPacket backToSurvivalPacket = SecretSpectator.copyPacketWithModifiedEntries(
+                            new PlayerListS2CPacket(EnumSet.of(PlayerListS2CPacket.Action.UPDATE_GAME_MODE), pretendSurvivalPlayers),
+                            entry -> SecretSpectator.cloneEntryWithGamemode(entry, GameMode.SURVIVAL)
+                    );
+                    this.player.networkHandler.sendPacket(backToSurvivalPacket);
                 }
             }
         }
