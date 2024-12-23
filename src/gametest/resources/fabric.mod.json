@@ -1,0 +1,18 @@
+{
+    "schemaVersion": 1,
+    "id": "secret-spectator-gametest",
+    "name": "secret-spectator gametests",
+    "version": "1.0.0",
+    "environment": "*",
+    "entrypoints": {
+        "fabric-gametest" : [
+            "net.replaceitem.secretspectator.gametest.tests.SwitchGameModeTests$SurvivalToSpectator",
+            "net.replaceitem.secretspectator.gametest.tests.SwitchGameModeTests$SpectatorToSurvival",
+            "net.replaceitem.secretspectator.gametest.tests.JoinTests$Survival",
+            "net.replaceitem.secretspectator.gametest.tests.JoinTests$Spectator"
+        ]
+    },
+    "mixins": [
+        "secret-spectator-gametest.mixins.json"
+    ]
+}
