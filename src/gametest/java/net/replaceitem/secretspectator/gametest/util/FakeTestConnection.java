@@ -2,8 +2,8 @@ package net.replaceitem.secretspectator.gametest.util;
 
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.NetworkSide;
-import net.minecraft.network.NetworkState;
 import net.minecraft.network.listener.PacketListener;
+import net.minecraft.network.state.NetworkState;
 
 public class FakeTestConnection extends ClientConnection {
     public FakeTestConnection(NetworkSide side) {

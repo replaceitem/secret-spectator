@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.8-SNAPSHOT'
+    id 'fabric-loom' version '1.10-SNAPSHOT'
     id 'maven-publish'
     id "com.modrinth.minotaur" version "2.+"
 }
@@ -47,7 +47,7 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modGametestImplementation "net.fabricmc.fabric-api:fabric-api:0.110.5+1.21.4"
+    modGametestImplementation "net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5"
     gametestImplementation sourceSets.main.output
 }
 
