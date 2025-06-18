@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 
 @Mixin(ServerPlayerInteractionManager.class)
 public class ServerPlayerInteractionManagerMixin {
@@ -39,7 +40,7 @@ public class ServerPlayerInteractionManagerMixin {
             }
         } else {
             // we let all know we went in survival
-            original.call(this.player.server.getPlayerManager(), packet);
+            original.call(Objects.requireNonNull(this.player.getServer()).getPlayerManager(), packet);
             // other spectators tell us they're in survival
             if(!SecretSpectator.canSeeOtherSpectators(this.player)) {
                 List<ServerPlayerEntity> pretendSurvivalPlayers = playerManager.getPlayerList().stream().filter(other -> !other.equals(this.player) && other.isSpectator()).toList();
