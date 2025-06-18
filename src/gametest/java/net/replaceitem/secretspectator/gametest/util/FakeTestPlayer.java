@@ -1,12 +1,12 @@
 package net.replaceitem.secretspectator.gametest.util;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
 import net.minecraft.world.GameMode;
 import net.replaceitem.secretspectator.gametest.mixin.ServerPlayerInteractionManagerAccessor;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ public class FakeTestPlayer extends ServerPlayerEntity {
     }
 
     @Override
-    public void readGameModeNbt(@Nullable NbtCompound nbt) {
+    public void readGameModeData(@Nullable ReadView view) {
         ((ServerPlayerInteractionManagerAccessor) this.interactionManager).callSetGameMode(gameMode, null);
     }
 }
