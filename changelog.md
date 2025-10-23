@@ -1,1 +1,1 @@
-* Update to Minecraft 1.21.6 (Thanks to [#4](https://github.com/replaceitem/secret-spectator/pull/4) by [PadBro](https://github.com/PadBro))
+* Updated to Minecraft 1.21.10
