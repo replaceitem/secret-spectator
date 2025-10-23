@@ -30,7 +30,7 @@ public class PlayerManagerMixin {
         PlayerListS2CPacket.Entry entry = playerListS2CPacket.getEntries().getFirst();
         ServerPlayerEntity player = instance.getPlayer(entry.profileId());
         if(player != null && player.isSpectator()) {
-            // we log in as spectator
+            // other player logged in as spectator
             PlayerListS2CPacket fakePacket = SecretSpectator.copyPacketWithModifiedEntries(playerListS2CPacket, entry1 -> SecretSpectator.cloneEntryWithGamemode(entry1, GameMode.SURVIVAL));
             for (ServerPlayerEntity serverPlayerEntity : instance.getPlayerList()) {
                 serverPlayerEntity.networkHandler.sendPacket(SecretSpectator.canPlayerSeeThatOtherIsSpectator(serverPlayerEntity, player) ? packet : fakePacket);

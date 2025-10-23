@@ -9,15 +9,14 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.world.GameMode;
 import net.replaceitem.secretspectator.gametest.mixin.ServerPlayerInteractionManagerAccessor;
-import org.jetbrains.annotations.Nullable;
 
 public class FakeTestPlayer extends ServerPlayerEntity {
     private final VirtualPlayerList playerList = new VirtualPlayerList();
-    private final GameMode gameMode;
+    private final GameMode targetGameMode;
     
-    public FakeTestPlayer(MinecraftServer server, ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, GameMode gameMode) {
+    public FakeTestPlayer(MinecraftServer server, ServerWorld world, GameProfile profile, SyncedClientOptions clientOptions, GameMode targetGameMode) {
         super(server, world, profile, clientOptions);
-        this.gameMode = gameMode;
+        this.targetGameMode = targetGameMode;
     }
     
     public void onPlayerListPacket(PlayerListS2CPacket playerListS2CPacket) {
@@ -27,9 +26,8 @@ public class FakeTestPlayer extends ServerPlayerEntity {
     public VirtualPlayerList getPlayerList() {
         return playerList;
     }
-
-    @Override
-    public void readGameModeData(@Nullable ReadView view) {
-        ((ServerPlayerInteractionManagerAccessor) this.interactionManager).callSetGameMode(gameMode, null);
+    
+    public void loadInitialData() {
+        this.changeGameMode(this.targetGameMode);
     }
 }

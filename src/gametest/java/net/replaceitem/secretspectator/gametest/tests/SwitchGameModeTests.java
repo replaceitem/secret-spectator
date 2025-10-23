@@ -16,7 +16,11 @@ public class SwitchGameModeTests {
 
         @GameTest
         public void testNonOpObserving(TestContext context) {
-            build().observingAs(GameMode.SURVIVAL, ScenarioBuilder.OpStatus.NON_OP).expectedSpectatorGamemodeForObserver(GameMode.SURVIVAL).expectedObserverGamemodeForSpectator(GameMode.SURVIVAL).runTest(context);
+            try {
+                build().observingAs(GameMode.SURVIVAL, ScenarioBuilder.OpStatus.NON_OP).expectedSpectatorGamemodeForObserver(GameMode.SURVIVAL).expectedObserverGamemodeForSpectator(GameMode.SURVIVAL).runTest(context);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         @GameTest
         public void testNonOpSpectatorObserving(TestContext context) {

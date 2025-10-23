@@ -7,6 +7,7 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.GameMode;
 import net.replaceitem.secretspectator.SecretSpectator;
 import org.spongepowered.asm.mixin.Final;
@@ -22,13 +23,22 @@ import java.util.Objects;
 public class ServerPlayerInteractionManagerMixin {
     @Shadow @Final protected ServerPlayerEntity player;
 
+    @Shadow protected ServerWorld world;
+
     @WrapOperation(method = "changeGameMode", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;sendToAll(Lnet/minecraft/network/packet/Packet;)V"))
     private void sendPackets(PlayerManager playerManager, Packet<?> packet, Operation<Void> original) {
         if(this.player.isSpectator()) {
+            var modifiedPacket = SecretSpectator.copyPacketWithModifiedEntries(
+                    ((PlayerListS2CPacket) packet),
+                    entry -> SecretSpectator.cloneEntryWithGamemode(entry, GameMode.SURVIVAL)
+            );
             for (ServerPlayerEntity other : playerManager.getPlayerList()) {
                 if(SecretSpectator.canPlayerSeeThatOtherIsSpectator(other, this.player)) {
                     // let other players know who should see us being in spectator
                     other.networkHandler.sendPacket(packet);
+                } else {
+                    // tell the rest we are in survival
+                    other.networkHandler.sendPacket(modifiedPacket);
                 }
             }
             // send all current spectators to us
@@ -40,7 +50,7 @@ public class ServerPlayerInteractionManagerMixin {
             }
         } else {
             // we let all know we went in survival
-            original.call(Objects.requireNonNull(this.player.getServer()).getPlayerManager(), packet);
+            original.call(Objects.requireNonNull(this.world.getServer()).getPlayerManager(), packet);
             // other spectators tell us they're in survival
             if(!SecretSpectator.canSeeOtherSpectators(this.player)) {
                 List<ServerPlayerEntity> pretendSurvivalPlayers = playerManager.getPlayerList().stream().filter(other -> !other.equals(this.player) && other.isSpectator()).toList();
