@@ -1,7 +1,10 @@
 package net.replaceitem.secretspectator.gametest.util;
 
-import java.util.concurrent.ThreadLocalRandom;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.world.level.GameType;
+import org.jspecify.annotations.Nullable;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public interface TestContextExtension {
     FakeTestPlayer createFakeTestPlayer(FakePlayerOptions gameMode);
@@ -9,7 +12,7 @@ public interface TestContextExtension {
     class FakePlayerOptions {
         String name = "TestPlayer" + Long.toHexString(ThreadLocalRandom.current().nextLong(0xFFFFFFFFL));
         GameType gameMode = GameType.DEFAULT_MODE;
-        int opLevel = 0;
+        @Nullable LevelBasedPermissionSet opLevel;
         
         public FakePlayerOptions name(String value) {
             this.name = value;
@@ -21,7 +24,7 @@ public interface TestContextExtension {
             return this;
         }
         
-        public FakePlayerOptions opLevel(int value) {
+        public FakePlayerOptions opLevel(@Nullable LevelBasedPermissionSet value) {
             this.opLevel = value;
             return this;
         }
@@ -34,7 +37,8 @@ public interface TestContextExtension {
             return gameMode;
         }
 
-        public int getOpLevel() {
+        @Nullable
+        public LevelBasedPermissionSet getOpLevel() {
             return opLevel;
         }
     }

@@ -3,6 +3,7 @@ package net.replaceitem.secretspectator.gametest.tests;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.world.level.GameType;
 import net.replaceitem.secretspectator.gametest.util.FakeTestPlayer;
 import net.replaceitem.secretspectator.gametest.util.TestContextExtension;
@@ -92,7 +93,7 @@ public class SwitchGameModeTests {
 
         public void runTest(GameTestHelper context) {
             TestContextExtension testContextExtension = (TestContextExtension) context;
-            FakeTestPlayer observer = testContextExtension.createFakeTestPlayer(new TestContextExtension.FakePlayerOptions().gameMode(observerGameMode).opLevel(isObserverOp ? 4 : 0));
+            FakeTestPlayer observer = testContextExtension.createFakeTestPlayer(new TestContextExtension.FakePlayerOptions().gameMode(observerGameMode).opLevel(isObserverOp ? LevelBasedPermissionSet.OWNER : null));
             FakeTestPlayer spectator = testContextExtension.createFakeTestPlayer(new TestContextExtension.FakePlayerOptions().gameMode(from));
 
             spectator.setGameMode(to);

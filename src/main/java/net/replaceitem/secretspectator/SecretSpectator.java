@@ -3,6 +3,7 @@ package net.replaceitem.secretspectator;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.level.GameType;
 import net.replaceitem.secretspectator.mixin.PlayerListS2CPacketAccessor;
 
@@ -27,7 +28,7 @@ public class SecretSpectator implements ModInitializer {
     
     
     public static boolean canSeeOtherSpectators(ServerPlayer player) {
-        return player.isSpectator() || player.hasPermissions(2);
+        return player.isSpectator() || player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
     }
     
     public static boolean canPlayerSeeThatOtherIsSpectator(ServerPlayer player, ServerPlayer other) {

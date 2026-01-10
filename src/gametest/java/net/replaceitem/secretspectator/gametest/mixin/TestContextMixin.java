@@ -8,6 +8,7 @@ import net.minecraft.server.*;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.players.ServerOpList;
@@ -16,6 +17,7 @@ import net.minecraft.world.phys.AABB;
 import net.replaceitem.secretspectator.gametest.util.FakeTestConnection;
 import net.replaceitem.secretspectator.gametest.util.FakeTestPlayer;
 import net.replaceitem.secretspectator.gametest.util.TestContextExtension;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,8 +45,8 @@ public abstract class TestContextMixin implements TestContextExtension {
     }
 
     @Unique
-    private static void setOpLevel(ServerOpList opList, NameAndId profile, int level) {
-        if(level == 0) {
+    private static void setOpLevel(ServerOpList opList, NameAndId profile, @Nullable LevelBasedPermissionSet level) {
+        if(level == null) {
             opList.remove(profile);
         } else {
             opList.add(new ServerOpListEntry(profile, level, false));
