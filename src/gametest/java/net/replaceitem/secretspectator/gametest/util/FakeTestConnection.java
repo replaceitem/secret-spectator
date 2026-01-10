@@ -1,17 +1,17 @@
 package net.replaceitem.secretspectator.gametest.util;
 
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.NetworkSide;
-import net.minecraft.network.listener.PacketListener;
-import net.minecraft.network.state.NetworkState;
+import net.minecraft.network.Connection;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.ProtocolInfo;
+import net.minecraft.network.protocol.PacketFlow;
 
-public class FakeTestConnection extends ClientConnection {
-    public FakeTestConnection(NetworkSide side) {
+public class FakeTestConnection extends Connection {
+    public FakeTestConnection(PacketFlow side) {
         super(side);
     }
 
     @Override
-    public void tryDisableAutoRead() {
+    public void setReadOnly() {
         
     }
 
@@ -21,12 +21,12 @@ public class FakeTestConnection extends ClientConnection {
     }
 
     @Override
-    public void setInitialPacketListener(PacketListener packetListener) {
+    public void setListenerForServerboundHandshake(PacketListener packetListener) {
         
     }
 
     @Override
-    public <T extends PacketListener> void transitionInbound(NetworkState<T> state, T packetListener) {
+    public <T extends PacketListener> void setupInboundProtocol(ProtocolInfo<T> state, T packetListener) {
         
     }
 }

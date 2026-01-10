@@ -1,15 +1,15 @@
 package net.replaceitem.secretspectator.mixin;
 
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 
-@Mixin(PlayerListS2CPacket.class)
+@Mixin(ClientboundPlayerInfoUpdatePacket.class)
 public interface PlayerListS2CPacketAccessor {
     @Mutable
     @Accessor
-    void setEntries(List<PlayerListS2CPacket.Entry> entries);
+    void setEntries(List<ClientboundPlayerInfoUpdatePacket.Entry> entries);
 }

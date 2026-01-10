@@ -1,14 +1,18 @@
 package net.replaceitem.secretspectator.gametest.mixin;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.network.NetworkSide;
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.server.*;
-import net.minecraft.server.network.ConnectedClientData;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.test.TestContext;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.Box;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.players.NameAndId;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.server.players.ServerOpList;
+import net.minecraft.server.players.ServerOpListEntry;
+import net.minecraft.world.phys.AABB;
 import net.replaceitem.secretspectator.gametest.util.FakeTestConnection;
 import net.replaceitem.secretspectator.gametest.util.FakeTestPlayer;
 import net.replaceitem.secretspectator.gametest.util.TestContextExtension;
@@ -17,33 +21,33 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 @SuppressWarnings("AddedMixinMembersNamePattern")
-@Mixin(TestContext.class)
+@Mixin(GameTestHelper.class)
 public abstract class TestContextMixin implements TestContextExtension {
 
-    @Shadow public abstract ServerWorld getWorld();
+    @Shadow public abstract ServerLevel getLevel();
 
-    @Shadow public abstract Box getTestBox();
+    @Shadow public abstract AABB getBounds();
 
     @Override
     public FakeTestPlayer createFakeTestPlayer(FakePlayerOptions options) {
-        ServerWorld world = this.getWorld();
+        ServerLevel world = this.getLevel();
         MinecraftServer server = world.getServer();
-        GameProfile profile = Uuids.getOfflinePlayerProfile(options.getName());
-        PlayerManager playerManager = server.getPlayerManager();
-        FakeTestPlayer fakeTestPlayer = new FakeTestPlayer(server, world, profile, SyncedClientOptions.createDefault(), options.getGameMode());
-        setOpLevel(playerManager.getOpList(), fakeTestPlayer.getPlayerConfigEntry(), options.getOpLevel());
-        playerManager.onPlayerConnect(new FakeTestConnection(NetworkSide.SERVERBOUND), fakeTestPlayer, new ConnectedClientData(profile, 0, fakeTestPlayer.getClientOptions(), false));
+        GameProfile profile = UUIDUtil.createOfflineProfile(options.getName());
+        PlayerList playerManager = server.getPlayerList();
+        FakeTestPlayer fakeTestPlayer = new FakeTestPlayer(server, world, profile, ClientInformation.createDefault(), options.getGameMode());
+        setOpLevel(playerManager.getOps(), fakeTestPlayer.nameAndId(), options.getOpLevel());
+        playerManager.placeNewPlayer(new FakeTestConnection(PacketFlow.SERVERBOUND), fakeTestPlayer, new CommonListenerCookie(profile, 0, fakeTestPlayer.clientInformation(), false));
         fakeTestPlayer.loadInitialData();
-        fakeTestPlayer.refreshPositionAndAngles(this.getTestBox().getCenter(), 0, 0);
+        fakeTestPlayer.snapTo(this.getBounds().getCenter(), 0, 0);
         return fakeTestPlayer;
     }
 
     @Unique
-    private static void setOpLevel(OperatorList opList, PlayerConfigEntry profile, int level) {
+    private static void setOpLevel(ServerOpList opList, NameAndId profile, int level) {
         if(level == 0) {
             opList.remove(profile);
         } else {
-            opList.add(new OperatorEntry(profile, level, false));
+            opList.add(new ServerOpListEntry(profile, level, false));
         }
     }
 }

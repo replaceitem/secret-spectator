@@ -1,13 +1,13 @@
 package net.replaceitem.secretspectator.gametest.mixin;
 
-import net.minecraft.server.network.ServerPlayerInteractionManager;
-import net.minecraft.world.GameMode;
+import net.minecraft.server.level.ServerPlayerGameMode;
+import net.minecraft.world.level.GameType;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(ServerPlayerInteractionManager.class)
+@Mixin(ServerPlayerGameMode.class)
 public interface ServerPlayerInteractionManagerAccessor {
     @Invoker
-    void callSetGameMode(GameMode gameMode, @Nullable GameMode previousGameMode);
+    void callSetGameModeForPlayer(GameType gameMode, @Nullable GameType previousGameMode);
 }

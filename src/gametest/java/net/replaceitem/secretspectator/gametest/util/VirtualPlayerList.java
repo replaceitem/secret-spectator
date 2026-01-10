@@ -1,41 +1,40 @@
 package net.replaceitem.secretspectator.gametest.util;
 
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.GameMode;
-
 import java.util.*;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 
 public class VirtualPlayerList {
     private final Map<UUID, VirtualPlayerListEntry> playerListEntries = new HashMap<>();
     
-    public Optional<GameMode> getGameMode(ServerPlayerEntity player) {
-        return Optional.ofNullable(playerListEntries.get(player.getUuid())).map(virtualPlayerListEntry -> virtualPlayerListEntry.gameMode);
+    public Optional<GameType> getGameMode(ServerPlayer player) {
+        return Optional.ofNullable(playerListEntries.get(player.getUUID())).map(virtualPlayerListEntry -> virtualPlayerListEntry.gameMode);
     }
     
-    public void onPacket(PlayerListS2CPacket packet) {
-        for (PlayerListS2CPacket.Entry entry : packet.getPlayerAdditionEntries()) {
+    public void onPacket(ClientboundPlayerInfoUpdatePacket packet) {
+        for (ClientboundPlayerInfoUpdatePacket.Entry entry : packet.newEntries()) {
             VirtualPlayerListEntry playerListEntry = new VirtualPlayerListEntry();
             this.playerListEntries.putIfAbsent(entry.profileId(), playerListEntry);
         }
 
-        for (PlayerListS2CPacket.Entry entry : packet.getEntries()) {
+        for (ClientboundPlayerInfoUpdatePacket.Entry entry : packet.entries()) {
             VirtualPlayerListEntry playerListEntry = this.playerListEntries.get(entry.profileId());
             if (playerListEntry != null) {
-                for (PlayerListS2CPacket.Action action : packet.getActions()) {
+                for (ClientboundPlayerInfoUpdatePacket.Action action : packet.actions()) {
                     this.handlePlayerListAction(action, entry, playerListEntry);
                 }
             }
         }
     }
 
-    private void handlePlayerListAction(PlayerListS2CPacket.Action action, PlayerListS2CPacket.Entry receivedEntry, VirtualPlayerListEntry currentEntry) {
-        if (Objects.requireNonNull(action) == PlayerListS2CPacket.Action.UPDATE_GAME_MODE) {
+    private void handlePlayerListAction(ClientboundPlayerInfoUpdatePacket.Action action, ClientboundPlayerInfoUpdatePacket.Entry receivedEntry, VirtualPlayerListEntry currentEntry) {
+        if (Objects.requireNonNull(action) == ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE) {
             currentEntry.gameMode = receivedEntry.gameMode();
         }
     }
     
     private static class VirtualPlayerListEntry {
-        private GameMode gameMode = GameMode.DEFAULT;
+        private GameType gameMode = GameType.DEFAULT_MODE;
     }
 }

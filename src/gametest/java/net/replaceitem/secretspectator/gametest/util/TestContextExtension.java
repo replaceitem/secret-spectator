@@ -1,15 +1,14 @@
 package net.replaceitem.secretspectator.gametest.util;
 
-import net.minecraft.world.GameMode;
-
 import java.util.concurrent.ThreadLocalRandom;
+import net.minecraft.world.level.GameType;
 
 public interface TestContextExtension {
     FakeTestPlayer createFakeTestPlayer(FakePlayerOptions gameMode);
     
     class FakePlayerOptions {
         String name = "TestPlayer" + Long.toHexString(ThreadLocalRandom.current().nextLong(0xFFFFFFFFL));
-        GameMode gameMode = GameMode.DEFAULT;
+        GameType gameMode = GameType.DEFAULT_MODE;
         int opLevel = 0;
         
         public FakePlayerOptions name(String value) {
@@ -17,7 +16,7 @@ public interface TestContextExtension {
             return this;
         }
         
-        public FakePlayerOptions gameMode(GameMode value) {
+        public FakePlayerOptions gameMode(GameType value) {
             this.gameMode = value;
             return this;
         }
@@ -31,7 +30,7 @@ public interface TestContextExtension {
             return name;
         }
 
-        public GameMode getGameMode() {
+        public GameType getGameMode() {
             return gameMode;
         }
 
